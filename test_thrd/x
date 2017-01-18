@@ -1,0 +1,13 @@
+err_content=`make 2>&1|grep "error"`
+
+err_content_len=`echo ${#err_content}`
+
+if [ ${#err_content_len} -gt 0 ]
+then
+	echo ${err_content}
+else
+	insmod test.ko
+	rmmod test.ko
+	dmesg|tail
+fi
+

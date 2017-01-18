@@ -1,0 +1,14 @@
+*.ko
+*.o
+*.out
+*.order
+*.symvers
+*.mod.*
+
+*.*o.cmd
+
+*.layout
+*.mod
+*.cproject
+*.c~
+

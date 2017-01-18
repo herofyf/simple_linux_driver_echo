@@ -1,0 +1,5 @@
+make 
+insmod test.ko
+rmmod test.ko
+
+dmesg|tail

@@ -1,0 +1,182 @@
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/kref.h>
+#include <linux/mutex.h>
+#include <linux/kfifo.h>
+#include <linux/slab.h>
+#include <linux/sched.h>
+#include <linux/kthread.h>
+#include <linux/delay.h>
+#include <linux/semaphore.h>
+#include <linux/types.h>
+#include <linux/rcupdate.h>
+
+MODULE_LICENSE("GPL");
+
+
+#define ENTER()   printk(KERN_DEBUG "%s() Enter", __func__)
+#define EXIT()    printk(KERN_DEBUG "%s() Exit", __func__)
+#define ERR(fmt, args...) printk(KERN_ERR "%s()-%d: " fmt "\n", __func__, __LINE__, ##args)
+#define DBG(fmt, args...) printk(KERN_DEBUG "%s()-%d: " fmt "\n", __func__, __LINE__, ##args)
+
+static struct task_struct *read_thr = NULL;
+static struct task_struct *write_thr = NULL;
+
+struct semaphore sem_w;
+struct semaphore sem_r;
+static atomic_t at1;
+
+
+static int read_func(void *data) {
+	ENTER();
+
+	while (true) {
+		// condition 2
+		if (kthread_should_stop()) {
+			DBG("read thread is to break quit");
+			break;
+		}
+	
+		// condition 1
+		down(&sem_r);
+	
+		// condition1 + condition 2 -> job
+		DBG("thread is running");
+		msleep_interruptible(2000);
+		atomic_sub(1, &at1);
+		DBG("atomic v = %d", at1.counter);
+
+		// generate the result
+		up(&sem_w);
+	}
+
+	EXIT();
+}
+
+static int write_func(void *data) {
+	ENTER();
+
+	while (true) {
+		// condition 2
+		if (kthread_should_stop()) {
+			DBG("read thread is to break quit");
+			break;
+		}
+
+		// condition 1
+		down(&sem_w);
+
+		DBG("thread is running");
+		msleep_interruptible(2000);
+		atomic_add(1, &at1);
+
+		// generate the result
+		up(&sem_r);
+	}
+
+	EXIT();
+}
+
+
+void test_thrd_init() {
+	ENTER();
+
+	atomic_set(&at1, 0);
+	sema_init(&sem_r, 0);
+	sema_init(&sem_w, 1);
+	read_thr = kthread_run(read_func, NULL, "read-thread %d", 1);
+
+	write_thr = kthread_run(write_func, NULL, "write-thread %d", 1);
+
+	EXIT();
+}
+
+void test_thrd_uninit() {
+	DBG("atomic v = %d", at1.counter);
+
+	if (read_thr) {
+		DBG("kthread stop");
+		kthread_stop(read_thr);
+		read_thr = NULL;
+	}
+
+	if (write_thr) {
+		DBG("kthread stop");
+		kthread_stop(write_thr);
+		write_thr = NULL;
+	}
+
+}
+
+//EXPORT_SYMBOL(test_thrd_init);
+
+int *gp = NULL;
+static int rcu_test(void *data) {
+
+	while (kthread_should_stop() == false) {
+		rcu_read_lock();
+		int *p = rcu_dereference(gp);
+	
+		printk(KERN_INFO "got ptr val =%d\n", *p);
+		rcu_read_unlock();	
+		msleep_interruptible(200);
+	}
+}
+
+static struct task_struct *thr_rcu = NULL;
+
+void test_rcu_init() {
+	
+	int *q = kmalloc(sizeof(int), GFP_KERNEL);
+	*q = 12;
+	gp = q;
+	thr_rcu = kthread_run(rcu_test, NULL, "rcu-thread %d", 1);
+	int *tmp;	
+	int i = 0; 	
+	for(i = 0; i < 10; i ++) {
+		msleep_interruptible(180);
+		q = kmalloc(sizeof(int), GFP_KERNEL);
+		*q = i;
+		printk(KERN_INFO "before got ptr val =%d\n", *q);
+		tmp = gp;
+		rcu_assign_pointer(gp, q);
+		synchronize_rcu();
+		kfree(tmp);	
+	}
+}
+
+void test_rcu_uninit() {
+	if (thr_rcu) {
+		kthread_stop(thr_rcu);
+		thr_rcu = NULL;
+	}	
+	
+	if (gp) {
+		kfree(gp);
+	}
+}
+
+static int __init test_init(void) {
+	ENTER();
+
+	test_rcu_init();
+
+//	test_thrd_init();
+
+	EXIT();
+	return 0;
+}
+
+static void __exit test_exit(void) {
+
+	ENTER();
+
+//	test_thrd_uninit();
+	test_rcu_uninit();
+	EXIT();
+	return;
+}
+
+module_init(test_init);
+module_exit(test_exit);

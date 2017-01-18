@@ -1,0 +1,347 @@
+
+test.ko:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <testq>:
+struct my_data {
+	int x;
+	int y;
+};
+
+void testq() {
+   0:	e8 00 00 00 00       	callq  5 <testq+0x5>
+   5:	55                   	push   %rbp
+	// init queue
+	struct kfifo fifo;
+	int ret;
+	ret = kfifo_alloc(&fifo, 512, GFP_KERNEL);
+   6:	b9 d0 00 00 00       	mov    $0xd0,%ecx
+   b:	ba 01 00 00 00       	mov    $0x1,%edx
+  10:	be 00 02 00 00       	mov    $0x200,%esi
+struct my_data {
+	int x;
+	int y;
+};
+
+void testq() {
+  15:	48 89 e5             	mov    %rsp,%rbp
+  18:	53                   	push   %rbx
+	// init queue
+	struct kfifo fifo;
+	int ret;
+	ret = kfifo_alloc(&fifo, 512, GFP_KERNEL);
+	if (ret != 0) {
+  19:	31 db                	xor    %ebx,%ebx
+
+void testq() {
+	// init queue
+	struct kfifo fifo;
+	int ret;
+	ret = kfifo_alloc(&fifo, 512, GFP_KERNEL);
+  1b:	48 8d 7d e0          	lea    -0x20(%rbp),%rdi
+struct my_data {
+	int x;
+	int y;
+};
+
+void testq() {
+  1f:	48 83 ec 20          	sub    $0x20,%rsp
+	// init queue
+	struct kfifo fifo;
+	int ret;
+	ret = kfifo_alloc(&fifo, 512, GFP_KERNEL);
+  23:	e8 00 00 00 00       	callq  28 <testq+0x28>
+	if (ret != 0) {
+  28:	85 c0                	test   %eax,%eax
+  2a:	0f 85 a0 00 00 00    	jne    d0 <testq+0xd0>
+			int index = kmalloc_index(size);
+
+			if (!index)
+				return ZERO_SIZE_PTR;
+
+			return kmem_cache_alloc_trace(kmalloc_caches[index],
+  30:	48 8b 3d 00 00 00 00 	mov    0x0(%rip),%rdi        # 37 <testq+0x37>
+  37:	ba 08 00 00 00       	mov    $0x8,%edx
+  3c:	be d0 00 00 00       	mov    $0xd0,%esi
+  41:	e8 00 00 00 00       	callq  46 <testq+0x46>
+	struct my_data *data;
+	int i = 0;
+	for (; i < 10; i ++) {
+		data = kmalloc(sizeof(*data), GFP_KERNEL);
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+  46:	48 8d 75 d8          	lea    -0x28(%rbp),%rsi
+  4a:	48 8d 7d e0          	lea    -0x20(%rbp),%rdi
+
+	// push item in queue
+	struct my_data *data;
+	int i = 0;
+	for (; i < 10; i ++) {
+		data = kmalloc(sizeof(*data), GFP_KERNEL);
+  4e:	48 89 45 d8          	mov    %rax,-0x28(%rbp)
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+  52:	ba 08 00 00 00       	mov    $0x8,%edx
+	// push item in queue
+	struct my_data *data;
+	int i = 0;
+	for (; i < 10; i ++) {
+		data = kmalloc(sizeof(*data), GFP_KERNEL);
+		data->x = i;
+  57:	89 18                	mov    %ebx,(%rax)
+	}
+
+	// push item in queue
+	struct my_data *data;
+	int i = 0;
+	for (; i < 10; i ++) {
+  59:	83 c3 01             	add    $0x1,%ebx
+		data = kmalloc(sizeof(*data), GFP_KERNEL);
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+  5c:	e8 00 00 00 00       	callq  61 <testq+0x61>
+	}
+
+	// push item in queue
+	struct my_data *data;
+	int i = 0;
+	for (; i < 10; i ++) {
+  61:	83 fb 0a             	cmp    $0xa,%ebx
+  64:	75 ca                	jne    30 <testq+0x30>
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+	}
+
+	int size = kfifo_size(&fifo);
+	int ava = kfifo_avail(&fifo);
+  66:	8b 55 e0             	mov    -0x20(%rbp),%edx
+		data = kmalloc(sizeof(*data), GFP_KERNEL);
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+	}
+
+	int size = kfifo_size(&fifo);
+  69:	8b 4d e8             	mov    -0x18(%rbp),%ecx
+	int ava = kfifo_avail(&fifo);
+	int len = kfifo_len(&fifo);
+	int empty = kfifo_is_empty(&fifo);
+	int full = kfifo_is_full(&fifo);
+  6c:	45 31 c9             	xor    %r9d,%r9d
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+	}
+
+	int size = kfifo_size(&fifo);
+	int ava = kfifo_avail(&fifo);
+  6f:	8b 45 e4             	mov    -0x1c(%rbp),%eax
+	int len = kfifo_len(&fifo);
+	int empty = kfifo_is_empty(&fifo);
+	int full = kfifo_is_full(&fifo);
+	printk(KERN_INFO "fifo used %d, and avaiable %d, len=%d, empty=%d, full is %d.\n",
+  72:	48 c7 c7 00 00 00 00 	mov    $0x0,%rdi
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+	}
+
+	int size = kfifo_size(&fifo);
+	int ava = kfifo_avail(&fifo);
+  79:	89 d3                	mov    %edx,%ebx
+		data = kmalloc(sizeof(*data), GFP_KERNEL);
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+	}
+
+	int size = kfifo_size(&fifo);
+  7b:	8d 71 01             	lea    0x1(%rcx),%esi
+	int ava = kfifo_avail(&fifo);
+  7e:	29 c3                	sub    %eax,%ebx
+	int len = kfifo_len(&fifo);
+	int empty = kfifo_is_empty(&fifo);
+	int full = kfifo_is_full(&fifo);
+  80:	39 d9                	cmp    %ebx,%ecx
+	printk(KERN_INFO "fifo used %d, and avaiable %d, len=%d, empty=%d, full is %d.\n",
+  82:	89 d9                	mov    %ebx,%ecx
+
+	int size = kfifo_size(&fifo);
+	int ava = kfifo_avail(&fifo);
+	int len = kfifo_len(&fifo);
+	int empty = kfifo_is_empty(&fifo);
+	int full = kfifo_is_full(&fifo);
+  84:	41 0f 92 c1          	setb   %r9b
+	}
+
+	int size = kfifo_size(&fifo);
+	int ava = kfifo_avail(&fifo);
+	int len = kfifo_len(&fifo);
+	int empty = kfifo_is_empty(&fifo);
+  88:	45 31 c0             	xor    %r8d,%r8d
+  8b:	39 c2                	cmp    %eax,%edx
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+	}
+
+	int size = kfifo_size(&fifo);
+	int ava = kfifo_avail(&fifo);
+  8d:	89 f2                	mov    %esi,%edx
+	int len = kfifo_len(&fifo);
+	int empty = kfifo_is_empty(&fifo);
+  8f:	41 0f 94 c0          	sete   %r8b
+	int full = kfifo_is_full(&fifo);
+	printk(KERN_INFO "fifo used %d, and avaiable %d, len=%d, empty=%d, full is %d.\n",
+  93:	31 c0                	xor    %eax,%eax
+		data->x = i;
+		kfifo_in(&fifo, &data, sizeof(data));
+	}
+
+	int size = kfifo_size(&fifo);
+	int ava = kfifo_avail(&fifo);
+  95:	29 da                	sub    %ebx,%edx
+	int len = kfifo_len(&fifo);
+	int empty = kfifo_is_empty(&fifo);
+	int full = kfifo_is_full(&fifo);
+	printk(KERN_INFO "fifo used %d, and avaiable %d, len=%d, empty=%d, full is %d.\n",
+  97:	e8 00 00 00 00       	callq  9c <testq+0x9c>
+			size, ava, len, empty, full);
+
+	i = 0;	
+	int offset = 0;
+	while (offset < len){
+  9c:	85 db                	test   %ebx,%ebx
+  9e:	7e 11                	jle    b1 <testq+0xb1>
+  a0:	31 c0                	xor    %eax,%eax
+  a2:	eb 06                	jmp    aa <testq+0xaa>
+  a4:	0f 1f 40 00          	nopl   0x0(%rax)
+  a8:	89 d0                	mov    %edx,%eax
+  aa:	39 d8                	cmp    %ebx,%eax
+  ac:	8d 50 08             	lea    0x8(%rax),%edx
+  af:	7c f7                	jl     a8 <testq+0xa8>
+	}
+	
+
+	// print all of items in queue
+	i = 0;
+	while (kfifo_is_empty(&fifo) == false) {
+  b1:	8b 45 e4             	mov    -0x1c(%rbp),%eax
+  b4:	39 45 e0             	cmp    %eax,-0x20(%rbp)
+  b7:	75 2c                	jne    e5 <testq+0xe5>
+		i += 1;
+		kfree(data);
+	}
+
+	// destory queue
+	kfifo_free(&fifo);
+  b9:	48 8d 7d e0          	lea    -0x20(%rbp),%rdi
+  bd:	e8 00 00 00 00       	callq  c2 <testq+0xc2>
+
+}
+  c2:	48 83 c4 20          	add    $0x20,%rsp
+  c6:	5b                   	pop    %rbx
+  c7:	5d                   	pop    %rbp
+  c8:	c3                   	retq   
+  c9:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+	// init queue
+	struct kfifo fifo;
+	int ret;
+	ret = kfifo_alloc(&fifo, 512, GFP_KERNEL);
+	if (ret != 0) {
+		printk(KERN_ERR "kfifo alloc failed.");
+  d0:	48 c7 c7 00 00 00 00 	mov    $0x0,%rdi
+  d7:	31 c0                	xor    %eax,%eax
+  d9:	e8 00 00 00 00       	callq  de <testq+0xde>
+	}
+
+	// destory queue
+	kfifo_free(&fifo);
+
+}
+  de:	48 83 c4 20          	add    $0x20,%rsp
+  e2:	5b                   	pop    %rbx
+  e3:	5d                   	pop    %rbp
+  e4:	c3                   	retq   
+	}
+	
+
+	// print all of items in queue
+	i = 0;
+	while (kfifo_is_empty(&fifo) == false) {
+  e5:	31 db                	xor    %ebx,%ebx
+		ret = kfifo_out(&fifo, &data, sizeof(data));
+  e7:	48 8d 75 d8          	lea    -0x28(%rbp),%rsi
+  eb:	48 8d 7d e0          	lea    -0x20(%rbp),%rdi
+  ef:	ba 08 00 00 00       	mov    $0x8,%edx
+  f4:	e8 00 00 00 00       	callq  f9 <testq+0xf9>
+		printk(KERN_INFO "item %d=%d\n",i, data->x);
+  f9:	48 8b 45 d8          	mov    -0x28(%rbp),%rax
+  fd:	89 de                	mov    %ebx,%esi
+  ff:	48 c7 c7 00 00 00 00 	mov    $0x0,%rdi
+		i += 1;
+ 106:	83 c3 01             	add    $0x1,%ebx
+
+	// print all of items in queue
+	i = 0;
+	while (kfifo_is_empty(&fifo) == false) {
+		ret = kfifo_out(&fifo, &data, sizeof(data));
+		printk(KERN_INFO "item %d=%d\n",i, data->x);
+ 109:	8b 10                	mov    (%rax),%edx
+ 10b:	31 c0                	xor    %eax,%eax
+ 10d:	e8 00 00 00 00       	callq  112 <testq+0x112>
+		i += 1;
+		kfree(data);
+ 112:	48 8b 7d d8          	mov    -0x28(%rbp),%rdi
+ 116:	e8 00 00 00 00       	callq  11b <testq+0x11b>
+	}
+	
+
+	// print all of items in queue
+	i = 0;
+	while (kfifo_is_empty(&fifo) == false) {
+ 11b:	8b 45 e4             	mov    -0x1c(%rbp),%eax
+ 11e:	39 45 e0             	cmp    %eax,-0x20(%rbp)
+ 121:	74 96                	je     b9 <testq+0xb9>
+ 123:	eb c2                	jmp    e7 <testq+0xe7>
+ 125:	0f 1f 00             	nopl   (%rax)
+
+Disassembly of section .init.text:
+
+0000000000000000 <init_module>:
+	// destory queue
+	kfifo_free(&fifo);
+
+}
+
+static int __init testq_init(void) {
+   0:	55                   	push   %rbp
+
+	testq();
+   1:	31 c0                	xor    %eax,%eax
+	// destory queue
+	kfifo_free(&fifo);
+
+}
+
+static int __init testq_init(void) {
+   3:	48 89 e5             	mov    %rsp,%rbp
+
+	testq();
+   6:	e8 00 00 00 00       	callq  b <init_module+0xb>
+
+	return 0;
+}
+   b:	31 c0                	xor    %eax,%eax
+   d:	5d                   	pop    %rbp
+   e:	c3                   	retq   
+
+Disassembly of section .exit.text:
+
+0000000000000000 <cleanup_module>:
+
+static void __exit testq_exit(void) {
+   0:	55                   	push   %rbp
+   1:	48 89 e5             	mov    %rsp,%rbp
+
+	return;
+}
+   4:	5d                   	pop    %rbp
+   5:	c3                   	retq   
