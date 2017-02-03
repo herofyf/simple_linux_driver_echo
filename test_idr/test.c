@@ -8,6 +8,10 @@ struct student {
 	char * name;
 };
 
+void kk(struct student *st) {
+	printk(KERN_INFO "in kk st = %d\n", st->id);
+}
+
 int print_idr_item(int id, void *p, void *data) {
 	
 	struct student *ps = (struct student *)(p);
@@ -15,6 +19,7 @@ int print_idr_item(int id, void *p, void *data) {
 		printk(KERN_INFO "idr id = %d, val = %d\n", id, ps->id);
 	}	
 
+	kk(ps);
 	// pls don't return nonzero, it causes break
 	return 0;
 }

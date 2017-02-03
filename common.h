@@ -8,6 +8,17 @@
 #include <linux/kfifo.h>
 #include <linux/time.h>
 
+#define USE_KM
+
+#ifdef USE_KM
+ #define malloc(x, y)  kmalloc(x, y)
+ #define free(x)  kfree(x)
+#else
+ #define malloc(x) vmalloc(x)
+ #define free(x) vfree(x)
+#endif
+
+
 void print_current_time(int is_new_line) {
 	struct timeval *tv;
 	struct tm *t;

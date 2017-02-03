@@ -1,7 +1,7 @@
 obj-m+=rbt.o
-rbt-objs:=test.o 
 
-MY_CFLAGS+=-DDEBUG_OUTPUT
+MY_CFLAGS+=-DDEBUG_OUTPUT 
+MY_CFLAGS+=-I$(shell pwd)/.. 
 ccflags-y+=${MY_CFLAGS}
 CC+=${MY_CFLAGS}
 
