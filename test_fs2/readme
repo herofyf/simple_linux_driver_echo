@@ -1,0 +1,5 @@
+mkdir dir
+touch image
+
+mount -t lwnfs none image dir
+cat dir/counter

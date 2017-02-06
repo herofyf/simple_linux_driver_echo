@@ -19,7 +19,7 @@
 #endif
 
 
-void print_current_time(int is_new_line) {
+static void print_current_time(int is_new_line) {
 	struct timeval *tv;
 	struct tm *t;
 
