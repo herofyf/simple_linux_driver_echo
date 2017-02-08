@@ -1,5 +1,5 @@
 obj-m :=aufs.o
-aufs-objs := super.o file.o node.o
+aufs-objs := super.o file.o 
 
 MY_CFLAGS+=-DDEBUG_OUTPUT 
 MY_CFLAGS+=-I$(shell pwd)/.. 

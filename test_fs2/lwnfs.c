@@ -56,6 +56,7 @@ static struct inode *lfs_make_inode(struct super_block *sb, int mode)
  */
 static int lfs_open(struct inode *inode, struct file *filp)
 {
+	printk(KERN_INFO "lfs open. \n");
 	filp->private_data = inode->i_private;
 	return 0;
 }
@@ -70,6 +71,7 @@ static int lfs_open(struct inode *inode, struct file *filp)
 static ssize_t lfs_read_file(struct file *filp, char *buf,
 		size_t count, loff_t *offset)
 {
+	printk(KERN_INFO "lfs open.\n");
 	atomic_t *counter = (atomic_t *) filp->private_data;
 	int v, len;
 	char tmp[TMPSIZE];

@@ -1,5 +1,56 @@
 #include "aufs.h"
 
+extern const struct file_operations aufs_file_operations;
+
+static struct inode *aufs_new_node(struct super_block *sb, int mode) {
+	struct inode *node = new_inode(sb);
+	if (node == NULL) {
+		return NULL;
+	}	
+
+	node->i_blocks = 0;	
+	node->i_mode = mode;
+	node->i_uid = node->i_gid = 0;
+	node->i_atime = node->i_mtime = node->i_ctime = CURRENT_TIME;
+	return node;
+}
+
+static void aufs_create_files(struct super_block *sb, struct dentry *root_de) {
+	// at here we need to create a file and a sub directory which has a file included
+	struct inode *node = NULL;
+	struct dentry *dentry = NULL;
+
+	struct qstr d_name; 
+	
+	d_name.name = "counter";
+	d_name.len = 7;
+	d_name.hash = full_name_hash(d_name.name, d_name.len);
+
+	// how to add as its sub file	
+	dentry = d_alloc(root_de, &d_name);
+	if (dentry == NULL) {
+		return;
+	} 
+
+	node = aufs_new_node(sb, S_IFREG | 0644);
+	if (node == NULL) {
+		goto error_de_out;
+	}
+
+	node->i_fop = &aufs_file_operations;
+	
+	d_add(dentry, node);
+
+	printk(KERN_INFO "aufs create files done.\n");
+	return;
+
+error_de_out:
+	if (dentry != NULL) {
+		dput(dentry);
+	} 
+	return;
+}
+
 static void aufs_put_super(struct super_block *sb) {
 	// to free extra information belong to this file systemo
 	// such if you have extra structure in sb->s_fs_info 
@@ -8,28 +59,49 @@ static void aufs_put_super(struct super_block *sb) {
 
 static struct super_operations const aufs_super_ops = {
 	.put_super = aufs_put_super,
+	.statfs = simple_statfs,
+	.drop_inode = generic_delete_inode,
 };
 
 
-int aufs_fill_sb(struct super_block *sb, void *data, int silent) {
+static int aufs_fill_sb(struct super_block *sb, void *data, int silent) {
 	// for super block members
 	struct inode *root = NULL;
 
+	sb->s_blocksize_bits = PAGE_CACHE_SHIFT;
+	sb->s_blocksize = PAGE_CACHE_SIZE;
 	sb->s_magic = AUFS_MAGIC;
 	sb->s_op = &aufs_super_ops;
 	
-	root = new_inode(sb);
-	root->i_sb = sb;
-	root->i_mtime = root->i_atime = root->i_ctime = CURRENT_TIME;
+	root = aufs_new_node(sb, S_IFDIR | 0755);
+	if (root == NULL) {
+		goto error_inode_out;
+	}
+	root->i_op = &simple_dir_inode_operations;
+	root->i_fop = &simple_dir_operations;	
 
-	// because it is file property	
-	root->i_mode = S_IFDIR;
-	root->i_op = &aufs_dir_inode_operations;
-	root->i_fop = &aufs_file_operations;	
+	struct dentry *root_dentry = NULL;
+	root_dentry = d_make_root(root);
+	if (root_dentry == NULL) {
+		goto error_de_out;
+	}
+	sb->s_root = root_dentry;
 
-	sb->s_root = d_make_root(root);
+	aufs_create_files(sb, root_dentry);
 	return 0;
-	
+
+error_de_out:
+	if (root_dentry != NULL) {
+		dput(root_dentry);
+	}
+
+error_inode_out:
+	if (root != NULL) {
+		iput(root);
+	}
+
+	return -ENOMEM;
+
 }
 
 struct dentry *aufs_mount(struct file_system_type *type, int flags,
@@ -44,15 +116,18 @@ struct dentry *aufs_mount(struct file_system_type *type, int flags,
 	return entry; 
 }
 
-void kill_block_super(struct super_block *sb) {
+void kill_aufs_super(struct super_block *sb) {
 	printk(KERN_INFO "kill aufs super block.\n");
+
+	// kill all of nodes	
+	kill_litter_super(sb);
 }
 
 static struct file_system_type aufs_type = {
 		.owner = THIS_MODULE,
 		.name = "aufs",
 		.mount = aufs_mount,
-		.kill_sb = kill_block_super,
+		.kill_sb = kill_aufs_super,
 		.fs_flags = FS_REQUIRES_DEV,
 };
 
